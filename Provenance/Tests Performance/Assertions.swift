@@ -101,18 +101,19 @@ extension Tests {
         tolerance: Double = 0.10,
         metric: Tests.Metric = .median
     ) throws(Tests.Error) {
-        let currentValue = metric.extract(from: current)
-        let baselineValue = metric.extract(from: baseline)
+        let comparison = Tests.Comparison(
+            name: "",
+            current: current,
+            baseline: baseline,
+            metric: metric
+        )
 
-        let regression =
-            (currentValue.inSeconds - baselineValue.inSeconds) / baselineValue.inSeconds
-
-        guard regression <= tolerance else {
+        guard comparison.change <= tolerance else {
             throw Tests.Error.regressionDetected(
                 metric: metric,
-                baseline: baselineValue,
-                current: currentValue,
-                regression: regression,
+                baseline: comparison.baselineValue,
+                current: comparison.currentValue,
+                regression: comparison.change,
                 tolerance: tolerance
             )
         }
