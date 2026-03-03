@@ -16,12 +16,12 @@ extension Tests {
     ///
     /// Example:
     /// ```swift
-    /// try Tests.expectPerformance(lessThan: .milliseconds(100)) {
+    /// try Tests.expect(lessThan: .milliseconds(100)) {
     ///     numbers.sum()
     /// }
     /// ```
     @discardableResult
-    public static func expectPerformance<T>(
+    public static func expect<T>(
         lessThan threshold: Duration,
         warmup: Int = 0,
         iterations: Int = 10,
@@ -52,7 +52,7 @@ extension Tests {
     /// The operation must be non-throwing (symmetric with the sync overload).
     /// If benchmarking a throwing operation, handle errors inside the closure.
     @discardableResult
-    public static func expectPerformance<T>(
+    public static func expect<T>(
         lessThan threshold: Duration,
         warmup: Int = 0,
         iterations: Int = 10,
@@ -95,6 +95,12 @@ extension Tests {
     ///     tolerance: 0.10  // 10% regression allowed
     /// )
     /// ```
+    // WORKAROUND: Compound method name expectNoRegression [API-NAME-002]
+    // WHY: "no regression" is an indivisible semantic concept — splitting across
+    //   Swift parameter labels produces awkward signatures that obscure intent.
+    // WHEN TO REMOVE: When a Property-based nested accessor (e.g. expect.noRegression)
+    //   is available for the Tests namespace.
+    // TRACKING: naming-implementation-audit-swift-tests-swift-testing.md N16
     public static func expectNoRegression(
         current: Tests.Measurement,
         baseline: Tests.Measurement,
