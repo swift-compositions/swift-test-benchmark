@@ -25,9 +25,9 @@ extension Tests {
         lessThan threshold: Duration,
         warmup: Int = 0,
         iterations: Int = 10,
-        metric: Tests.Metric = .median,
+        metric: Test.Benchmark.Metric = .median,
         operation: () -> T
-    ) throws(Tests.Error) -> (result: T, measurement: Tests.Measurement) {
+    ) throws(Tests.Error) -> (result: T, measurement: Test.Benchmark.Measurement) {
         let (result, measurement) = measure(
             warmup: warmup,
             iterations: iterations,
@@ -56,9 +56,9 @@ extension Tests {
         lessThan threshold: Duration,
         warmup: Int = 0,
         iterations: Int = 10,
-        metric: Tests.Metric = .median,
+        metric: Test.Benchmark.Metric = .median,
         operation: () async -> T
-    ) async throws(Tests.Error) -> (result: T, measurement: Tests.Measurement) {
+    ) async throws(Tests.Error) -> (result: T, measurement: Test.Benchmark.Measurement) {
         let (result, measurement) = await measure(
             warmup: warmup,
             iterations: iterations,
@@ -86,7 +86,7 @@ extension Tests {
     ///
     /// Example:
     /// ```swift
-    /// let baseline = Tests.Measurement(durations: [.milliseconds(10)])
+    /// let baseline = Test.Benchmark.Measurement(durations: [.milliseconds(10)])
     /// let (result, measurement) = Tests.measure { operation() }
     ///
     /// Tests.expectNoRegression(
@@ -102,10 +102,10 @@ extension Tests {
     //   is available for the Tests namespace.
     // TRACKING: naming-implementation-audit-swift-tests-swift-testing.md N16
     public static func expectNoRegression(
-        current: Tests.Measurement,
-        baseline: Tests.Measurement,
+        current: Test.Benchmark.Measurement,
+        baseline: Test.Benchmark.Measurement,
         tolerance: Double = 0.10,
-        metric: Tests.Metric = .median
+        metric: Test.Benchmark.Metric = .median
     ) throws(Tests.Error) {
         let comparison = Tests.Comparison(
             name: "",
