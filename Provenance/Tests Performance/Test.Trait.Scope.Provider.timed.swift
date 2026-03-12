@@ -168,26 +168,26 @@ extension Test.Trait.Scope.Provider {
 
         // Throw if threshold exceeded
         if exceeded {
-            throw .thresholdExceeded(
+            throw .benchmarkFailed(.thresholdExceeded(
                 test: entry.id.name,
                 metric: config.evaluation.metric,
                 expected: config.evaluation.threshold!,
                 actual: metricValue
-            )
+            ))
         }
 
         // Throw if baseline regression exceeded
         if let comparison, let tolerance = config.evaluation.baselineTolerance,
             comparison.change > tolerance
         {
-            throw .regressionDetected(
+            throw .benchmarkFailed(.regressionDetected(
                 test: entry.id.name,
                 metric: config.evaluation.metric,
                 baseline: comparison.baselineValue,
                 current: comparison.currentValue,
                 regression: comparison.change,
                 tolerance: tolerance
-            )
+            ))
         }
     }
 }

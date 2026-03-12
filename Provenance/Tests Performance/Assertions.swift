@@ -37,11 +37,12 @@ extension Tests {
         let actualDuration = metric.extract(from: measurement)
 
         guard actualDuration <= threshold else {
-            throw Tests.Error.performanceExpectationFailed(
+            throw Tests.Error.benchmarkFailed(.thresholdExceeded(
+                test: "",
                 metric: metric,
-                threshold: threshold,
+                expected: threshold,
                 actual: actualDuration
-            )
+            ))
         }
 
         return (result, measurement)
@@ -68,11 +69,12 @@ extension Tests {
         let actualDuration = metric.extract(from: measurement)
 
         guard actualDuration <= threshold else {
-            throw Tests.Error.performanceExpectationFailed(
+            throw Tests.Error.benchmarkFailed(.thresholdExceeded(
+                test: "",
                 metric: metric,
-                threshold: threshold,
+                expected: threshold,
                 actual: actualDuration
-            )
+            ))
         }
 
         return (result, measurement)
@@ -115,13 +117,14 @@ extension Tests {
         )
 
         guard comparison.change <= tolerance else {
-            throw Tests.Error.regressionDetected(
+            throw Tests.Error.benchmarkFailed(.regressionDetected(
+                test: "",
                 metric: metric,
                 baseline: comparison.baselineValue,
                 current: comparison.currentValue,
                 regression: comparison.change,
                 tolerance: tolerance
-            )
+            ))
         }
     }
 }
