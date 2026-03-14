@@ -145,6 +145,8 @@ extension Test.Trait.Scope.Provider {
 
         let diagnostic = Tests.Diagnostic(
             testName: entry.id.name,
+            suiteName: entry.id.suite,
+            qualifiedName: entry.id.fullyQualifiedName,
             metric: config.evaluation.metric,
             measurement: measurement,
             environment: environment,
@@ -159,6 +161,9 @@ extension Test.Trait.Scope.Provider {
             comparison: comparison,
             historyAnalysis: historyAnalysis
         )
+
+        // Register with global collector for summary table
+        Tests.Diagnostic.Collector.shared.append(diagnostic)
 
         // Print results if configured
         if config.evaluation.printResults {
