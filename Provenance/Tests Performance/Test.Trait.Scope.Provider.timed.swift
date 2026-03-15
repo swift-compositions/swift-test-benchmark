@@ -162,14 +162,10 @@ extension Test.Trait.Scope.Provider {
             historyAnalysis: historyAnalysis
         )
 
-        // Register with global collector for summary table
+        // Register with global collector for event emission and summary table.
+        // The runner drains the collector after all tests complete and emits
+        // events + console output from a single coordination point.
         Tests.Diagnostic.Collector.shared.append(diagnostic)
-
-        // Print results if configured
-        if config.evaluation.printResults {
-            print(diagnostic.formatted())
-            print(diagnostic.jsonBlock())
-        }
 
         // Throw if threshold exceeded
         if exceeded {
