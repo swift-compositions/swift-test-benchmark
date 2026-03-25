@@ -53,13 +53,10 @@ extension Test.Trait.Scope.Provider {
         }
 
         let testName = entry.id.fullyQualifiedName
-        _diagLog(testName, "ITERATIONS_DONE")
-
         let measurement = Test.Benchmark.Measurement(durations: durations)
 
         // Capture environment (needed for both diagnostics and baseline keying)
         let environment = Test.Environment.capture()
-        _diagLog(testName, "ENV_CAPTURED")
 
         // Shared root for baselines and history
         let root = Tests.Baseline.Storage.root()
@@ -79,9 +76,7 @@ extension Test.Trait.Scope.Provider {
             // Try to load existing baseline
             do {
                 storedBaseline = try await Tests.Baseline.Storage.load(at: baselinePath)
-            } catch {
-                _diagLog(testName, "BASELINE_LOAD_ERROR: \(error)")
-            }
+            } catch {}
 
             if let baseline = storedBaseline {
                 // Build comparison
@@ -94,22 +89,14 @@ extension Test.Trait.Scope.Provider {
 
                 // Overwrite baseline if recording mode is .all
                 if recording == .all {
-                    do {
-                        try await Tests.Baseline.Storage.save(measurement, to: baselinePath)
-                    } catch {
-                        _diagLog(testName, "BASELINE_SAVE_ERROR: \(error)")
-                    }
+                    try? await Tests.Baseline.Storage.save(measurement, to: baselinePath)
                 }
             } else {
                 // No baseline exists
                 switch recording {
                 case .normal, .all:
                     // Save current measurement as the new baseline
-                    do {
-                        try await Tests.Baseline.Storage.save(measurement, to: baselinePath)
-                    } catch {
-                        _diagLog(testName, "BASELINE_SAVE_ERROR: \(error)")
-                    }
+                    try? await Tests.Baseline.Storage.save(measurement, to: baselinePath)
                 case .never:
                     throw .baselineMissing(
                         test: entry.id.name,
@@ -118,8 +105,6 @@ extension Test.Trait.Scope.Provider {
                 }
             }
         }
-
-        _diagLog(testName, "BASELINE_DONE")
 
         // Build diagnostic
         let cv = measurement.coefficientOfVariation
@@ -140,7 +125,7 @@ extension Test.Trait.Scope.Provider {
 
         if Tests.History.Storage.isEnabled {
             let record = Tests.History.Record(
-                timestamp: _epochSeconds(),
+                timestamp: Kernel.Time.realtimeEpochSeconds(),
                 testID: entry.id,
                 metric: config.evaluation.metric,
                 metricValue: metricValue,
@@ -151,28 +136,17 @@ extension Test.Trait.Scope.Provider {
             )
 
             // Append current record
-            do {
-                try await Tests.History.Storage.append(record, root: root)
-            } catch {
-                _diagLog(testName, "HISTORY_APPEND_ERROR: \(error)")
-            }
+            try? await Tests.History.Storage.append(record, root: root)
 
             // Load full history (including the record we just appended)
             let records: [Tests.History.Record]
-            do {
-                records = try await Tests.History.Storage.load(
-                    root: root,
-                    testID: entry.id,
-                    fingerprint: environment.fingerprint
-                )
-            } catch {
-                _diagLog(testName, "HISTORY_LOAD_ERROR: \(error)")
-                records = []
-            }
+            records = (try? await Tests.History.Storage.load(
+                root: root,
+                testID: entry.id,
+                fingerprint: environment.fingerprint
+            )) ?? []
             historyAnalysis = Tests.History.Analysis.analyze(records)
         }
-
-        _diagLog(testName, "HISTORY_DONE")
 
         let diagnostic = Tests.Diagnostic(
             testName: entry.id.name,
@@ -197,7 +171,6 @@ extension Test.Trait.Scope.Provider {
         // The runner drains the collector after all tests complete and emits
         // events + console output from a single coordination point.
         Tests.Diagnostic.Collector.shared.append(diagnostic)
-        _diagLog(testName, "SCOPE_DONE")
 
         // Throw if threshold exceeded
         if exceeded {
@@ -225,18 +198,5 @@ extension Test.Trait.Scope.Provider {
     }
 }
 
-// MARK: - Timestamp
-
 import Kernel
 
-/// Returns current Unix epoch seconds via the platform's realtime clock.
-private func _epochSeconds() -> Double {
-    Kernel.Time.realtimeEpochSeconds()
-}
-
-/// Append one diagnostic line to `/tmp/io-bench-hang-diag.log`.
-/// Uses File_System (synchronous). Each write is < 200 bytes — trivial.
-private func _diagLog(_ test: Swift.String, _ phase: Swift.String) {
-    let line = "\(_epochSeconds()) | \(test) | \(phase)\n"
-    try? File(File.Path(stringLiteral: "/tmp/io-bench-hang-diag.log")).write.append(line)
-}
