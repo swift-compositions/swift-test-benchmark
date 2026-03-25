@@ -8,6 +8,7 @@
 import Clocks
 import Memory
 import File_System
+import IO
 
 extension Test.Trait.Scope.Provider {
     /// Scope provider for timed benchmark measurement.
@@ -76,7 +77,7 @@ extension Test.Trait.Scope.Provider {
             let recording = Tests.Baseline.Recording.current
 
             // Try to load existing baseline
-            storedBaseline = Tests.Baseline.Storage.load(at: baselinePath)
+            storedBaseline = try? await Tests.Baseline.Storage.load(at: baselinePath)
 
             if let baseline = storedBaseline {
                 // Build comparison
@@ -89,14 +90,14 @@ extension Test.Trait.Scope.Provider {
 
                 // Overwrite baseline if recording mode is .all
                 if recording == .all {
-                    try? Tests.Baseline.Storage.save(measurement, to: baselinePath)
+                    try? await Tests.Baseline.Storage.save(measurement, to: baselinePath)
                 }
             } else {
                 // No baseline exists
                 switch recording {
                 case .normal, .all:
                     // Save current measurement as the new baseline
-                    try? Tests.Baseline.Storage.save(measurement, to: baselinePath)
+                    try? await Tests.Baseline.Storage.save(measurement, to: baselinePath)
                 case .never:
                     throw .baselineMissing(
                         test: entry.id.name,
@@ -138,14 +139,14 @@ extension Test.Trait.Scope.Provider {
             )
 
             // Append current record
-            try? Tests.History.Storage.append(record, root: root)
+            try? await Tests.History.Storage.append(record, root: root)
 
             // Load full history (including the record we just appended)
-            let records = Tests.History.Storage.load(
+            let records = (try? await Tests.History.Storage.load(
                 root: root,
                 testID: entry.id,
                 fingerprint: environment.fingerprint
-            )
+            )) ?? []
             historyAnalysis = Tests.History.Analysis.analyze(records)
         }
 
