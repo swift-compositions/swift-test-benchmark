@@ -77,7 +77,11 @@ extension Test.Trait.Scope.Provider {
             let recording = Tests.Baseline.Recording.current
 
             // Try to load existing baseline
-            storedBaseline = try? await Tests.Baseline.Storage.load(at: baselinePath)
+            do {
+                storedBaseline = try await Tests.Baseline.Storage.load(at: baselinePath)
+            } catch {
+                _diagLog(testName, "BASELINE_LOAD_ERROR: \(error)")
+            }
 
             if let baseline = storedBaseline {
                 // Build comparison
@@ -90,14 +94,22 @@ extension Test.Trait.Scope.Provider {
 
                 // Overwrite baseline if recording mode is .all
                 if recording == .all {
-                    try? await Tests.Baseline.Storage.save(measurement, to: baselinePath)
+                    do {
+                        try await Tests.Baseline.Storage.save(measurement, to: baselinePath)
+                    } catch {
+                        _diagLog(testName, "BASELINE_SAVE_ERROR: \(error)")
+                    }
                 }
             } else {
                 // No baseline exists
                 switch recording {
                 case .normal, .all:
                     // Save current measurement as the new baseline
-                    try? await Tests.Baseline.Storage.save(measurement, to: baselinePath)
+                    do {
+                        try await Tests.Baseline.Storage.save(measurement, to: baselinePath)
+                    } catch {
+                        _diagLog(testName, "BASELINE_SAVE_ERROR: \(error)")
+                    }
                 case .never:
                     throw .baselineMissing(
                         test: entry.id.name,
@@ -139,14 +151,24 @@ extension Test.Trait.Scope.Provider {
             )
 
             // Append current record
-            try? await Tests.History.Storage.append(record, root: root)
+            do {
+                try await Tests.History.Storage.append(record, root: root)
+            } catch {
+                _diagLog(testName, "HISTORY_APPEND_ERROR: \(error)")
+            }
 
             // Load full history (including the record we just appended)
-            let records = (try? await Tests.History.Storage.load(
-                root: root,
-                testID: entry.id,
-                fingerprint: environment.fingerprint
-            )) ?? []
+            let records: [Tests.History.Record]
+            do {
+                records = try await Tests.History.Storage.load(
+                    root: root,
+                    testID: entry.id,
+                    fingerprint: environment.fingerprint
+                )
+            } catch {
+                _diagLog(testName, "HISTORY_LOAD_ERROR: \(error)")
+                records = []
+            }
             historyAnalysis = Tests.History.Analysis.analyze(records)
         }
 
