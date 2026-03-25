@@ -51,10 +51,14 @@ extension Test.Trait.Scope.Provider {
             }
         }
 
+        let testName = entry.id.fullyQualifiedName
+        _diagLog(testName, "ITERATIONS_DONE")
+
         let measurement = Test.Benchmark.Measurement(durations: durations)
 
         // Capture environment (needed for both diagnostics and baseline keying)
         let environment = Test.Environment.capture()
+        _diagLog(testName, "ENV_CAPTURED")
 
         // Shared root for baselines and history
         let root = Tests.Baseline.Storage.root()
@@ -102,6 +106,8 @@ extension Test.Trait.Scope.Provider {
             }
         }
 
+        _diagLog(testName, "BASELINE_DONE")
+
         // Build diagnostic
         let cv = measurement.coefficientOfVariation
         let mad = measurement.medianAbsoluteDeviation
@@ -143,6 +149,8 @@ extension Test.Trait.Scope.Provider {
             historyAnalysis = Tests.History.Analysis.analyze(records)
         }
 
+        _diagLog(testName, "HISTORY_DONE")
+
         let diagnostic = Tests.Diagnostic(
             testName: entry.id.name,
             suiteName: entry.id.suite,
@@ -166,6 +174,7 @@ extension Test.Trait.Scope.Provider {
         // The runner drains the collector after all tests complete and emits
         // events + console output from a single coordination point.
         Tests.Diagnostic.Collector.shared.append(diagnostic)
+        _diagLog(testName, "SCOPE_DONE")
 
         // Throw if threshold exceeded
         if exceeded {
@@ -200,4 +209,11 @@ import Kernel
 /// Returns current Unix epoch seconds via the platform's realtime clock.
 private func _epochSeconds() -> Double {
     Kernel.Time.realtimeEpochSeconds()
+}
+
+/// Append one diagnostic line to `/tmp/io-bench-hang-diag.log`.
+/// Uses File_System (synchronous). Each write is < 200 bytes — trivial.
+private func _diagLog(_ test: Swift.String, _ phase: Swift.String) {
+    let line = "\(_epochSeconds()) | \(test) | \(phase)\n"
+    try? File(File.Path(stringLiteral: "/tmp/io-bench-hang-diag.log")).write.append(line)
 }
