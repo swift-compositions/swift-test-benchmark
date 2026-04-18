@@ -125,7 +125,7 @@ extension Test.Trait.Scope.Provider {
 
         if Tests.History.Storage.isEnabled {
             let record = Tests.History.Record(
-                timestamp: Kernel.Time.realtimeEpochSeconds(),
+                timestamp: Kernel.Time.realtime(),
                 testID: entry.id,
                 metric: config.evaluation.metric,
                 metricValue: metricValue,
