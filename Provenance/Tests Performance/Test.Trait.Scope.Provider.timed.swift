@@ -6,9 +6,10 @@
 //
 
 import Clocks
-import Memory
 import File_System
 import IO
+import Kernel
+import Memory
 
 extension Test.Trait.Scope.Provider {
     /// Scope provider for timed benchmark measurement.
@@ -40,7 +41,8 @@ extension Test.Trait.Scope.Provider {
         var allocationStats: [Memory.Allocation.Statistics]? = config.evaluation.trackAllocations ? [] : nil
 
         for _ in 0..<config.iteration.count {
-            let before = config.evaluation.trackAllocations
+            let before =
+                config.evaluation.trackAllocations
                 ? Memory.Allocation.Statistics.capture()
                 : nil
             let start = Clock_Primitives.Clock.Continuous.now
@@ -97,6 +99,7 @@ extension Test.Trait.Scope.Provider {
                 case .normal, .all:
                     // Save current measurement as the new baseline
                     try? await Tests.Baseline.Storage.save(measurement, to: baselinePath)
+
                 case .never:
                     throw .baselineMissing(
                         test: entry.id.name,
@@ -114,11 +117,12 @@ extension Test.Trait.Scope.Provider {
 
         let metricValue = config.evaluation.metric.extract(from: measurement)
         let exceeded = config.evaluation.threshold.map { metricValue > $0 } ?? false
-        let factor: Double? = if let threshold = config.evaluation.threshold, exceeded {
-            metricValue.inSeconds / threshold.inSeconds
-        } else {
-            nil
-        }
+        let factor: Double? =
+            if let threshold = config.evaluation.threshold, exceeded {
+                metricValue.inSeconds / threshold.inSeconds
+            } else {
+                nil
+            }
 
         // Run history: append record and analyze cross-run trend
         var historyAnalysis: Tests.History.Analysis? = nil
@@ -140,11 +144,12 @@ extension Test.Trait.Scope.Provider {
 
             // Load full history (including the record we just appended)
             let records: [Tests.History.Record]
-            records = (try? await Tests.History.Storage.load(
-                root: root,
-                testID: entry.id,
-                fingerprint: environment.fingerprint
-            )) ?? []
+            records =
+                (try? await Tests.History.Storage.load(
+                    root: root,
+                    testID: entry.id,
+                    fingerprint: environment.fingerprint
+                )) ?? []
             historyAnalysis = Tests.History.Analysis.analyze(records)
         }
 
@@ -174,29 +179,30 @@ extension Test.Trait.Scope.Provider {
 
         // Throw if threshold exceeded
         if exceeded {
-            throw .benchmarkFailed(.thresholdExceeded(
-                test: entry.id.name,
-                metric: config.evaluation.metric,
-                expected: config.evaluation.threshold!,
-                actual: metricValue
-            ))
+            throw .benchmarkFailed(
+                .thresholdExceeded(
+                    test: entry.id.name,
+                    metric: config.evaluation.metric,
+                    expected: config.evaluation.threshold!,
+                    actual: metricValue
+                )
+            )
         }
 
         // Throw if baseline regression exceeded
         if let comparison, let tolerance = config.evaluation.baselineTolerance,
             comparison.change > tolerance
         {
-            throw .benchmarkFailed(.regressionDetected(
-                test: entry.id.name,
-                metric: config.evaluation.metric,
-                baseline: comparison.baselineValue,
-                current: comparison.currentValue,
-                regression: comparison.change,
-                tolerance: tolerance
-            ))
+            throw .benchmarkFailed(
+                .regressionDetected(
+                    test: entry.id.name,
+                    metric: config.evaluation.metric,
+                    baseline: comparison.baselineValue,
+                    current: comparison.currentValue,
+                    regression: comparison.change,
+                    tolerance: tolerance
+                )
+            )
         }
     }
 }
-
-import Kernel
-

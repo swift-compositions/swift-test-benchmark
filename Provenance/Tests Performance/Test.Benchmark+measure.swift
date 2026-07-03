@@ -9,9 +9,9 @@
 //
 // ===----------------------------------------------------------------------===//
 
-public import Time_Primitives
-public import Test_Primitives
 import Clocks
+public import Test_Primitives
+public import Time_Primitives
 
 extension Test.Benchmark {
     /// Measures the execution time of a block of code with multiple iterations.
@@ -75,14 +75,16 @@ extension Test.Benchmark {
         printPerformance(displayName, measurement)
 
         // Check threshold
-        if let threshold = threshold {
+        if let threshold {
             let actualMetric = metric.extract(from: measurement)
             if actualMetric > threshold {
-                print("""
+                print(
+                    """
                     ⚠️ Performance threshold exceeded in '\(displayName)':
                     Expected \(metric): < \(threshold.formatted())
                     Actual \(metric): \(actualMetric.formatted())
-                    """)
+                    """
+                )
             }
         }
 
@@ -121,14 +123,16 @@ extension Test.Benchmark {
         printPerformance(displayName, measurement)
 
         // Check threshold
-        if let threshold = threshold {
+        if let threshold {
             let actualMetric = metric.extract(from: measurement)
             if actualMetric > threshold {
-                print("""
+                print(
+                    """
                     ⚠️ Performance threshold exceeded in '\(displayName)':
                     Expected \(metric): < \(threshold.formatted())
                     Actual \(metric): \(actualMetric.formatted())
-                    """)
+                    """
+                )
             }
         }
 
@@ -138,7 +142,8 @@ extension Test.Benchmark {
     /// Prints a performance measurement summary.
     @usableFromInline
     static func printPerformance(_ name: Swift.String, _ measurement: Measurement) {
-        print("""
+        print(
+            """
             ⏱️ \(name)
                Iterations: \(measurement.durations.count)
                Min:        \(measurement.min.formatted())
@@ -148,6 +153,7 @@ extension Test.Benchmark {
                p99:        \(measurement.p99.formatted())
                Max:        \(measurement.max.formatted())
                StdDev:     \(measurement.standardDeviation.formatted())
-            """)
+            """
+        )
     }
 }

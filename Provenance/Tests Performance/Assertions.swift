@@ -27,7 +27,7 @@ extension Tests {
         iterations: Int = 10,
         metric: Test.Benchmark.Metric = .median,
         operation: () -> T
-    ) throws(Tests.Error) -> (result: T, measurement: Test.Benchmark.Measurement) {
+    ) throws(Self.Error) -> (result: T, measurement: Test.Benchmark.Measurement) {
         let (result, measurement) = measure(
             warmup: warmup,
             iterations: iterations,
@@ -37,12 +37,14 @@ extension Tests {
         let actualDuration = metric.extract(from: measurement)
 
         guard actualDuration <= threshold else {
-            throw Tests.Error.benchmarkFailed(.thresholdExceeded(
-                test: "",
-                metric: metric,
-                expected: threshold,
-                actual: actualDuration
-            ))
+            throw Self.Error.benchmarkFailed(
+                .thresholdExceeded(
+                    test: "",
+                    metric: metric,
+                    expected: threshold,
+                    actual: actualDuration
+                )
+            )
         }
 
         return (result, measurement)
@@ -59,7 +61,7 @@ extension Tests {
         iterations: Int = 10,
         metric: Test.Benchmark.Metric = .median,
         operation: () async -> T
-    ) async throws(Tests.Error) -> (result: T, measurement: Test.Benchmark.Measurement) {
+    ) async throws(Self.Error) -> (result: T, measurement: Test.Benchmark.Measurement) {
         let (result, measurement) = await measure(
             warmup: warmup,
             iterations: iterations,
@@ -69,12 +71,14 @@ extension Tests {
         let actualDuration = metric.extract(from: measurement)
 
         guard actualDuration <= threshold else {
-            throw Tests.Error.benchmarkFailed(.thresholdExceeded(
-                test: "",
-                metric: metric,
-                expected: threshold,
-                actual: actualDuration
-            ))
+            throw Self.Error.benchmarkFailed(
+                .thresholdExceeded(
+                    test: "",
+                    metric: metric,
+                    expected: threshold,
+                    actual: actualDuration
+                )
+            )
         }
 
         return (result, measurement)
@@ -108,8 +112,8 @@ extension Tests {
         baseline: Test.Benchmark.Measurement,
         tolerance: Double = 0.10,
         metric: Test.Benchmark.Metric = .median
-    ) throws(Tests.Error) {
-        let comparison = Tests.Comparison(
+    ) throws(Self.Error) {
+        let comparison = Self.Comparison(
             name: "",
             current: current,
             baseline: baseline,
@@ -117,14 +121,16 @@ extension Tests {
         )
 
         guard comparison.change <= tolerance else {
-            throw Tests.Error.benchmarkFailed(.regressionDetected(
-                test: "",
-                metric: metric,
-                baseline: comparison.baselineValue,
-                current: comparison.currentValue,
-                regression: comparison.change,
-                tolerance: tolerance
-            ))
+            throw Self.Error.benchmarkFailed(
+                .regressionDetected(
+                    test: "",
+                    metric: metric,
+                    baseline: comparison.baselineValue,
+                    current: comparison.currentValue,
+                    regression: comparison.change,
+                    tolerance: tolerance
+                )
+            )
         }
     }
 }
