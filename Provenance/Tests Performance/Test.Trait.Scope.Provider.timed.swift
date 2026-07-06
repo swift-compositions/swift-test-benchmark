@@ -91,14 +91,22 @@ extension Test.Trait.Scope.Provider {
 
                 // Overwrite baseline if recording mode is .all
                 if recording == .all {
-                    try? await Tests.Baseline.Storage.save(measurement, to: baselinePath)
+                    do {
+                        try await Tests.Baseline.Storage.save(measurement, to: baselinePath)
+                    } catch {
+                        // best-effort: baseline overwrite failure is non-fatal
+                    }
                 }
             } else {
                 // No baseline exists
                 switch recording {
                 case .normal, .all:
                     // Save current measurement as the new baseline
-                    try? await Tests.Baseline.Storage.save(measurement, to: baselinePath)
+                    do {
+                        try await Tests.Baseline.Storage.save(measurement, to: baselinePath)
+                    } catch {
+                        // best-effort: baseline save failure is non-fatal
+                    }
 
                 case .never:
                     throw .baselineMissing(
@@ -140,16 +148,24 @@ extension Test.Trait.Scope.Provider {
             )
 
             // Append current record
-            try? await Tests.History.Storage.append(record, root: root)
+            do {
+                try await Tests.History.Storage.append(record, root: root)
+            } catch {
+                // best-effort: history append failure is non-fatal
+            }
 
             // Load full history (including the record we just appended)
             let records: [Tests.History.Record]
-            records =
-                (try? await Tests.History.Storage.load(
+            do {
+                records = try await Tests.History.Storage.load(
                     root: root,
                     testID: entry.id,
                     fingerprint: environment.fingerprint
-                )) ?? []
+                )
+            } catch {
+                // best-effort: history load failure yields empty history
+                records = []
+            }
             historyAnalysis = Tests.History.Analysis.analyze(records)
         }
 
