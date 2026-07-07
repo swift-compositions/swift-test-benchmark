@@ -86,14 +86,12 @@ extension Tests {
 }
 
 extension Tests {
-    // swiftlint:disable:next workaround_marker_present
     // WORKAROUND: Compound method name expectNoRegression [API-NAME-002]
     // WHY: "no regression" is an indivisible semantic concept — splitting across
     //   Swift parameter labels produces awkward signatures that obscure intent.
     // WHEN TO REMOVE: When a Property-based nested accessor (e.g. expect.noRegression)
     //   is available for the Tests namespace.
     // TRACKING: naming-implementation-audit-swift-tests-swift-testing.md N16
-    // (four-part template present; blunt-regex ±5 window tripped by multi-line continuations)
     /// Performance regression detector
     ///
     /// Compares current performance against a baseline with tolerance.
