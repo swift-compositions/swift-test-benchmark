@@ -10,6 +10,7 @@ import File_System
 import IO
 import Kernel
 import Memory
+import Thread_Pool
 
 extension Test.Trait.Scope.Provider {
     /// Scope provider for timed benchmark measurement.
@@ -76,7 +77,7 @@ extension Test.Trait.Scope.Provider {
             let recording = Tests.Baseline.Recording.current
 
             // Try to load existing baseline
-            do {
+            do throws(Kernel.Thread.Pool.Error) {
                 storedBaseline = try await Tests.Baseline.Storage.load(at: baselinePath)
             } catch {}
 
@@ -91,7 +92,7 @@ extension Test.Trait.Scope.Provider {
 
                 // Overwrite baseline if recording mode is .all
                 if recording == .all {
-                    do {
+                    do throws(Either<Kernel.Thread.Pool.Error, Tests.Baseline.Storage.Error>) {
                         try await Tests.Baseline.Storage.save(measurement, to: baselinePath)
                     } catch {
                         // best-effort: baseline overwrite failure is non-fatal
@@ -102,7 +103,7 @@ extension Test.Trait.Scope.Provider {
                 switch recording {
                 case .normal, .all:
                     // Save current measurement as the new baseline
-                    do {
+                    do throws(Either<Kernel.Thread.Pool.Error, Tests.Baseline.Storage.Error>) {
                         try await Tests.Baseline.Storage.save(measurement, to: baselinePath)
                     } catch {
                         // best-effort: baseline save failure is non-fatal
@@ -148,7 +149,7 @@ extension Test.Trait.Scope.Provider {
             )
 
             // Append current record
-            do {
+            do throws(Either<Kernel.Thread.Pool.Error, Tests.History.Storage.Error>) {
                 try await Tests.History.Storage.append(record, root: root)
             } catch {
                 // best-effort: history append failure is non-fatal
@@ -156,7 +157,7 @@ extension Test.Trait.Scope.Provider {
 
             // Load full history (including the record we just appended)
             let records: [Tests.History.Record]
-            do {
+            do throws(Kernel.Thread.Pool.Error) {
                 records = try await Tests.History.Storage.load(
                     root: root,
                     testID: entry.id,
