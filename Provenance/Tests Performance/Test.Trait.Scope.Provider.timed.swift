@@ -39,7 +39,8 @@ extension Test.Trait.Scope.Provider {
         // Measured iterations
         var durations: [Duration] = []
         durations.reserveCapacity(config.iteration.count)
-        var allocationStats: [Memory.Allocation.Statistics]? = config.evaluation.trackAllocations ? [] : nil
+        var allocationStats: [Memory.Allocation.Statistics]? =
+            config.evaluation.trackAllocations ? [] : nil
 
         for _ in 0..<config.iteration.count {
             let before =
