@@ -6,10 +6,22 @@ let package = Package(
     platforms: [.macOS(.v27), .iOS(.v27), .tvOS(.v27), .watchOS(.v27), .visionOS(.v27)],
     products: [.library(name: "Test Benchmark", targets: ["Test Benchmark"])],
     dependencies: [
-        .package(url: "https://github.com/swift-primitives/swift-test.git", branch: "testing-stack/neutral-test-boundary"),
-        .package(url: "https://github.com/swift-primitives/swift-benchmark.git", branch: "main"),
-        .package(url: "https://github.com/swift-primitives/swift-source-primitives.git", branch: "main"),
-        .package(url: "https://github.com/swift-primitives/swift-cardinal-primitives.git", branch: "main"),
+        .package(
+            url: "https://github.com/swift-primitives/swift-test.git",
+            branch: "main"
+        ),
+        .package(
+            url: "https://github.com/swift-primitives/swift-benchmark.git",
+            branch: "main"
+        ),
+        .package(
+            url: "https://github.com/swift-primitives/swift-source-primitives.git",
+            branch: "main"
+        ),
+        .package(
+            url: "https://github.com/swift-primitives/swift-cardinal-primitives.git",
+            branch: "main"
+        ),
     ],
     targets: [
         .target(name: "Test Benchmark", dependencies: [
