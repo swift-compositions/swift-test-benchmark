@@ -7,11 +7,11 @@ let package = Package(
     products: [.library(name: "Test Benchmark", targets: ["Test Benchmark"])],
     dependencies: [
         .package(
-            url: "https://github.com/swift-primitives/swift-test.git",
+            url: "https://github.com/swift-molecules/swift-test.git",
             branch: "main"
         ),
         .package(
-            url: "https://github.com/swift-primitives/swift-benchmark.git",
+            url: "https://github.com/swift-molecules/swift-benchmark.git",
             branch: "main"
         ),
         .package(
