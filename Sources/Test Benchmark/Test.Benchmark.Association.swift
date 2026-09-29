@@ -4,7 +4,7 @@
 
 // swift-linter:disable:next target import edge
 // REASON: Source Primitives is a direct product dependency; the Benchmark module alias currently prevents the manifest scanner from recognizing later edges.
-public import Source_Primitives
+public import Source
 public import Test
 
 extension Test.Benchmark {

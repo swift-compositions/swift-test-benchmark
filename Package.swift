@@ -15,11 +15,11 @@ let package = Package(
             branch: "main"
         ),
         .package(
-            url: "https://github.com/swift-primitives/swift-source-primitives.git",
+            url: "https://github.com/swift-molecules/swift-source.git",
             branch: "main"
         ),
         .package(
-            url: "https://github.com/swift-primitives/swift-cardinal-primitives.git",
+            url: "https://github.com/swift-atoms/swift-cardinal.git",
             branch: "main"
         ),
     ],
@@ -27,15 +27,15 @@ let package = Package(
         .target(name: "Test Benchmark", dependencies: [
             .product(name: "Test", package: "swift-test"),
             .product(name: "Benchmark", package: "swift-benchmark", moduleAliases: ["Benchmark": "GenericBenchmark"]),
-            .product(name: "Source Primitives", package: "swift-source-primitives"),
-            .product(name: "Cardinal Primitives Standard Library Integration", package: "swift-cardinal-primitives"),
+            .product(name: "Source", package: "swift-source"),
+            .product(name: "Cardinal", package: "swift-cardinal"),
         ]),
         .testTarget(name: "Test Benchmark Tests", dependencies: [
             .target(name: "Test Benchmark"),
             .product(name: "Test", package: "swift-test"),
             .product(name: "Benchmark", package: "swift-benchmark", moduleAliases: ["Benchmark": "GenericBenchmark"]),
-            .product(name: "Source Primitives", package: "swift-source-primitives"),
-            .product(name: "Cardinal Primitives Standard Library Integration", package: "swift-cardinal-primitives"),
+            .product(name: "Source", package: "swift-source"),
+            .product(name: "Cardinal", package: "swift-cardinal"),
         ]),
     ],
     swiftLanguageModes: [.v6]

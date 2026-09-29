@@ -1,6 +1,6 @@
 import Benchmark
-import Cardinal_Primitives_Standard_Library_Integration
-import Source_Primitives
+import Cardinal
+import Source
 import Synchronization
 import Test
 import Test_Benchmark
