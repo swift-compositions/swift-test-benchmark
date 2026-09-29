@@ -26,14 +26,14 @@ let package = Package(
     targets: [
         .target(name: "Test Benchmark", dependencies: [
             .product(name: "Test", package: "swift-test"),
-            .product(name: "Benchmark", package: "swift-benchmark", moduleAliases: ["Benchmark": "GenericBenchmark"]),
+            .product(name: "Benchmark", package: "swift-benchmark"),
             .product(name: "Source", package: "swift-source"),
             .product(name: "Cardinal", package: "swift-cardinal"),
         ]),
         .testTarget(name: "Test Benchmark Tests", dependencies: [
             .target(name: "Test Benchmark"),
             .product(name: "Test", package: "swift-test"),
-            .product(name: "Benchmark", package: "swift-benchmark", moduleAliases: ["Benchmark": "GenericBenchmark"]),
+            .product(name: "Benchmark", package: "swift-benchmark"),
             .product(name: "Source", package: "swift-source"),
             .product(name: "Cardinal", package: "swift-cardinal"),
         ]),
