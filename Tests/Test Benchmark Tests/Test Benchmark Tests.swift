@@ -116,7 +116,10 @@ extension Relation {
                     recorder: { value in issues.withLock { $0.append(value) } },
                     evaluation: { _ in .regressed }
                 )
-                let result = await modifier.apply(isolation: nil) { await body.increment(); return 7 }
+                let result = await modifier.apply(isolation: nil) {
+                    await body.increment()
+                    return 7
+                }
                 #expect(result == 7)
                 #expect(await body.value == 1)
                 #expect(issues.withLock { $0.isEmpty })

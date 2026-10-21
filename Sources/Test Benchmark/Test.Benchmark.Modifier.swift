@@ -45,13 +45,15 @@ extension Test.Benchmark.Modifier {
         operation: @isolated(any) () async throws(E) -> sending Void
     ) async throws(E) {
         try await operation()
-        guard let receipt = Test.Benchmark.measure(
-            plan: plan,
-            workload: workload,
-            probe: probe,
-            association: association,
-            recorder: recorder
-        ) else { return }
+        guard
+            let receipt = Test.Benchmark.measure(
+                plan: plan,
+                workload: workload,
+                probe: probe,
+                association: association,
+                recorder: recorder
+            )
+        else { return }
         Test.Benchmark.assert(evaluation(receipt), association: association, recorder: recorder)
     }
 }

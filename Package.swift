@@ -24,29 +24,36 @@ let package = Package(
         ),
     ],
     targets: [
-        .target(name: "Test Benchmark", dependencies: [
-            .product(name: "Test", package: "swift-test"),
-            .product(name: "Benchmark", package: "swift-benchmark"),
-            .product(name: "Source", package: "swift-source"),
-            .product(name: "Cardinal", package: "swift-cardinal"),
-        ]),
-        .testTarget(name: "Test Benchmark Tests", dependencies: [
-            .target(name: "Test Benchmark"),
-            .product(name: "Test", package: "swift-test"),
-            .product(name: "Benchmark", package: "swift-benchmark"),
-            .product(name: "Source", package: "swift-source"),
-            .product(name: "Cardinal", package: "swift-cardinal"),
-        ]),
+        .target(
+            name: "Test Benchmark",
+            dependencies: [
+                .product(name: "Test", package: "swift-test"),
+                .product(name: "Benchmark", package: "swift-benchmark"),
+                .product(name: "Source", package: "swift-source"),
+                .product(name: "Cardinal", package: "swift-cardinal"),
+            ]
+        ),
+        .testTarget(
+            name: "Test Benchmark Tests",
+            dependencies: [
+                .target(name: "Test Benchmark"),
+                .product(name: "Test", package: "swift-test"),
+                .product(name: "Benchmark", package: "swift-benchmark"),
+                .product(name: "Source", package: "swift-source"),
+                .product(name: "Cardinal", package: "swift-cardinal"),
+            ]
+        ),
     ],
     swiftLanguageModes: [.v6]
 )
 
 for target in package.targets where ![.system, .binary, .plugin, .macro].contains(target.type) {
-    target.swiftSettings = (target.swiftSettings ?? []) + [
-        .strictMemorySafety(), .enableUpcomingFeature("ExistentialAny"),
-        .enableUpcomingFeature("InternalImportsByDefault"), .enableUpcomingFeature("MemberImportVisibility"),
-        .enableUpcomingFeature("NonisolatedNonsendingByDefault"), .enableExperimentalFeature("LifetimeDependence"),
-        .enableExperimentalFeature("Lifetimes"), .enableExperimentalFeature("SuppressedAssociatedTypes"),
-        .enableUpcomingFeature("InferIsolatedConformances"), .enableUpcomingFeature("LifetimeDependence"),
-    ]
+    target.swiftSettings =
+        (target.swiftSettings ?? []) + [
+            .strictMemorySafety(), .enableUpcomingFeature("ExistentialAny"),
+            .enableUpcomingFeature("InternalImportsByDefault"), .enableUpcomingFeature("MemberImportVisibility"),
+            .enableUpcomingFeature("NonisolatedNonsendingByDefault"), .enableExperimentalFeature("LifetimeDependence"),
+            .enableExperimentalFeature("Lifetimes"), .enableExperimentalFeature("SuppressedAssociatedTypes"),
+            .enableUpcomingFeature("InferIsolatedConformances"), .enableUpcomingFeature("LifetimeDependence"),
+        ]
 }
